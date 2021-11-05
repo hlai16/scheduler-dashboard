@@ -28,19 +28,47 @@ const data = [
 
 class Dashboard extends Component {
   state = {
-    loading: false
+    loading: false,
+    focused: null
   };
+
+  selectPanel(id) {
+    if (this.state.focused === null) {
+      this.setState({
+        focused: id
+      })
+    } else {
+      this.setState({
+        focused: null
+      })
+    }
+
+  }
+
   render() {
-    const dashboardClasses = classnames("dashboard");
-    const mapData = this.props.data.map(panel => 
-      <Panel key={panel.id} id={panel.id} label={panel.label} value={panel.value} {...panel} />
-    )
+    const dashboardClasses = classnames("dashboard", {
+      "dashboard--focused": this.state.focused
+    });
+
     if (this.state.loading) {
       return <Loading />;
     }
 
-    return <main className={dashboardClasses} />;
+    const panels = data
+      .filter(
+        panel => this.state.focused === null || this.state.focused === panel.id
+      )
+      .map(panel => (
+        <Panel
+          key={panel.id}
+          // id={panel.id}
+          label={panel.label}
+          value={panel.value}
+          onSelect={event => this.selectPanel(panel.id)}
+        />
+      ))
+
+    return <main className={dashboardClasses}>{panels}</main>;
   }
 }
-
 export default Dashboard;
